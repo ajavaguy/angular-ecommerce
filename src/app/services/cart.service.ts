@@ -39,7 +39,38 @@ export class CartService {
     this.computeCartTotals();
   }
 
-  private computeCartTotals() {
+  removeFromCart(theCartItem: CartItem){
+    let alreadyExistsInCart: boolean = false;
+    let existingCartItem: CartItem | undefined;
+    let index: number = -1;
+    if (this.cartItems.length > 0) {
+      index = this.getIndexAndCartItem(theCartItem).index;
+      // @ts-ignore
+      existingCartItem = this.getIndexAndCartItem(theCartItem).cartItem;
+
+      console.log("I AM INSIDE CART SERVICE")
+      // check if we really found the item
+      alreadyExistsInCart = (existingCartItem != undefined);
+    }
+    if (alreadyExistsInCart) {
+      let quantity = existingCartItem?.quantity;
+      // @ts-ignore
+      if(quantity > 1){
+        // @ts-ignore
+        quantity -= 1;
+      }else{
+        quantity = 0;
+        this.cartItems.splice(index, 1);
+      }
+      // @ts-ignore
+      existingCartItem?.quantity = quantity;
+    }
+
+    // compute cart total price and total quantity
+    this.computeCartTotals();
+  }
+
+  computeCartTotals() {
 
     let totalPriceValueOfItemsInTheCart: number = 0;
     let totalQuantityValueOfItemsInTheCart: number = 0;
@@ -69,5 +100,30 @@ export class CartService {
     The totalQuantityValueOfItemsInTheCart ${totalQuantityValueOfItemsInTheCart}`)
 
     console.log("-----END OF CART ITEM LOGS----")
+  }
+
+  private getIndexAndCartItem(theCartItem: CartItem){
+    let index = -1, resultItem: CartItem;
+    for(let i = 0; i < this.cartItems.length; i++){
+      if(this.cartItems[i].id == theCartItem.id){
+        index = i;
+        resultItem = this.cartItems[i];
+      }
+    }
+
+    // @ts-ignore
+    return new RemoveItemAttr(index, resultItem);
+
+  }
+}
+
+class RemoveItemAttr{
+  index: number;
+  cartItem: CartItem;
+
+
+  constructor(index: number, cartItem: CartItem) {
+    this.index = index;
+    this.cartItem = cartItem;
   }
 }
