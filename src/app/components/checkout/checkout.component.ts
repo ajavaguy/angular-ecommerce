@@ -1,8 +1,14 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators
+} from "@angular/forms";
 import {Luv2ShopFormService} from "../../services/luv2-shop-form.service";
 import {Country} from "../../common/country";
 import {State} from "../../common/state";
+import {Luv2ShopValidators} from "../../validators/luv2-shop-validators";
 
 @Component({
   selector: 'app-checkout',
@@ -49,29 +55,72 @@ export class CheckoutComponent implements OnInit {
     );
     this.checkOutFormGroup = this.formBuilder.group({
       customer: this.formBuilder.group({
-        firstName: [''],
-        lastName: [''],
-        email: ['']
+        firstName: new FormControl('',
+          [Validators.required,
+            Validators.minLength(2),
+            Luv2ShopValidators.notOnlyWhiteSpace]
+        ),
+        lastName: new FormControl('',
+          [Validators.required,
+            Validators.minLength(2),
+            Luv2ShopValidators.notOnlyWhiteSpace]
+        ),
+        email: new FormControl('',
+          [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]
+        ),
       }),
       shippingAddress: this.formBuilder.group({
-        country: [''],
-        street: [''],
-        city: [''],
-        state: [''],
-        zipcode: ['']
+        country: new FormControl('', [Validators.required]),
+        street: new FormControl('',
+          [Validators.required,
+            Validators.minLength(2),
+            Luv2ShopValidators.notOnlyWhiteSpace]
+        ),
+        city: new FormControl('',
+          [Validators.required,
+            Validators.minLength(2),
+            Luv2ShopValidators.notOnlyWhiteSpace]
+        ),
+        state: new FormControl('', [Validators.required]),
+        zipcode: new FormControl('',
+          [Validators.required,
+            Validators.minLength(6),
+            Luv2ShopValidators.notOnlyWhiteSpace]
+        )
       }),
       billingAddress: this.formBuilder.group({
-        country: [''],
-        street: [''],
-        city: [''],
-        state: [''],
-        zipcode: ['']
+        country: new FormControl('', [Validators.required]),
+        street: new FormControl('',
+          [Validators.required,
+            Validators.minLength(2),
+            Luv2ShopValidators.notOnlyWhiteSpace]
+        ),
+        city: new FormControl('',
+          [Validators.required,
+            Validators.minLength(2),
+            Luv2ShopValidators.notOnlyWhiteSpace]
+        ),
+        state: new FormControl('', [Validators.required]),
+        zipcode: new FormControl('',
+          [Validators.required,
+            Validators.minLength(6),
+            Luv2ShopValidators.notOnlyWhiteSpace]
+        )
       }),
       creditCard: this.formBuilder.group({
-        cardType: [''],
-        nameOnCard: [''],
-        cardNumber: [''],
-        securityCode: [''],
+        cardType: new FormControl('', [Validators.required]),
+        nameOnCard: new FormControl('',
+          [Validators.required,
+            Validators.minLength(2),
+            Luv2ShopValidators.notOnlyWhiteSpace]
+        ),
+        cardNumber: new FormControl('',
+          [Validators.pattern("[0-9]{16}"),
+            Validators.required]
+        ),
+        securityCode: new FormControl('',
+          [Validators.required,
+            Validators.pattern("[0-9]{3}")]),
         expirationMonth: [''],
         expirationYear: ['']
       })
@@ -81,10 +130,11 @@ export class CheckoutComponent implements OnInit {
   // the method name here can be anything
   onSubmit() {
     console.log("Handling the submit button");
-    console.log(this.checkOutFormGroup?.get('customer')?.value)
-    console.log(this.checkOutFormGroup?.get('shippingAddress')?.value)
-    console.log(`The shipping address country is: ${this.checkOutFormGroup?.get('shippingAddress')?.value.country.name}`)
-    console.log(`The shipping address state is: ${this.checkOutFormGroup?.get('shippingAddress')?.value.state.name}`)
+    if (this.checkOutFormGroup?.invalid) {
+      this.checkOutFormGroup.markAllAsTouched();
+    }
+    console.log(`CheckOutFormGroup is valid: ${this.checkOutFormGroup?.valid}`)
+
   }
 
   copyShippingAddressToBillingAddress(event: Event) {
@@ -136,4 +186,73 @@ export class CheckoutComponent implements OnInit {
 
 
   }
+
+  get firstName() {
+    return this.checkOutFormGroup?.get('customer.firstName');
+  }
+
+  get lastName() {
+    return this.checkOutFormGroup?.get('customer.lastName');
+  }
+
+  get email() {
+    return this.checkOutFormGroup?.get('customer.email');
+  }
+
+  get shippingAddressStreet() {
+    return this.checkOutFormGroup?.get('shippingAddress.street');
+  }
+
+  get shippingAddressCity() {
+    return this.checkOutFormGroup?.get('shippingAddress.city');
+  }
+
+  get shippingAddressZipcode() {
+    return this.checkOutFormGroup?.get('shippingAddress.zipcode');
+  }
+
+  get shippingAddressState() {
+    return this.checkOutFormGroup?.get('shippingAddress.state');
+  }
+
+  get shippingAddressCountry() {
+    return this.checkOutFormGroup?.get('shippingAddress.country');
+  }
+
+  get billingAddressStreet() {
+    return this.checkOutFormGroup?.get('billingAddress.street');
+  }
+
+  get billingAddressCity() {
+    return this.checkOutFormGroup?.get('billingAddress.city');
+  }
+
+  get billingAddressZipcode() {
+    return this.checkOutFormGroup?.get('billingAddress.zipcode');
+  }
+
+  get billingAddressState() {
+    return this.checkOutFormGroup?.get('billingAddress.state');
+  }
+
+  get billingAddressCountry() {
+    return this.checkOutFormGroup?.get('billingAddress.country');
+  }
+
+  get creditCardType(){
+    return this.checkOutFormGroup?.get('creditCard.cardType');
+  }
+
+  get creditCardNameOnCard(){
+    return this.checkOutFormGroup?.get('creditCard.nameOnCard');
+  }
+
+  get creditCardNumber(){
+    return this.checkOutFormGroup?.get('creditCard.cardNumber');
+  }
+
+  get creditCardSecurityCode(){
+    return this.checkOutFormGroup?.get('creditCard.securityCode');
+  }
+
 }
